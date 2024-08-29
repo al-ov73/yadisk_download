@@ -34,7 +34,6 @@ const PrivateRoute = ({ children }) => {
   if (localStorage.getItem('user')) {
     auth.loggedIn = true;
   }
-  console.log('auth.loggedIn', auth.loggedIn)
   return (
     auth.loggedIn ? children : <Navigate to="/login" state={{ from: location }} />
   );

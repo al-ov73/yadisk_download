@@ -1,0 +1,26 @@
+services:
+  web:
+    build:
+      context: ./web
+    container_name: yadisk-frontend
+    depends_on:
+      - yadisk_download
+    ports:
+      - 3000:3000
+    env_file:
+      - ./web/.env
+    volumes:
+      - ./web:/web
+    command: sh -c 'npm start'
+
+  yadisk_download:
+    build:
+      context: .
+    container_name: yadisk_download
+    ports:
+      - 8000:8000
+    environment:
+      - SECRET_KEY=super_secret_key
+    volumes:
+      - ./:/yadisk_download
+    command: sh -c 'poetry run gunicorn yadisk_download.wsgi:application --workers 4 --bind=0.0.0.0:8000'

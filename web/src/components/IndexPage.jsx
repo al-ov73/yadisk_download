@@ -14,6 +14,7 @@ import routes from '../routes/routes.js';
 
 const IndexPage = () => {
   const [files, setFiles] = useState([]);
+  const [error, setError] = useState(null);
 
   let count = 0;
 
@@ -23,10 +24,15 @@ const IndexPage = () => {
     }
     try {
       const response = await axios.post(routes.linksPath, requestBody)
-      setFiles(response.data)
-
+      console.log('response', response)
+      if (response.status === 200) {
+        setFiles(response.data)
+      } else if (response.status === 400) {
+        setError(response.data)
+      }
     } catch (e) {
       console.log('error', e);
+      setError(e.response.data)
     }
   };
 
@@ -68,6 +74,7 @@ const IndexPage = () => {
         Отправить
       </Button>
       </Container>
+      {error}
       {files.length > 0 &&
       <Container>
       <Table striped bordered hover className="text-center">

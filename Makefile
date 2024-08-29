@@ -1,9 +1,5 @@
-start:
-	python manage.py runserver
+docker-build:
+	docker compose -f docker-compose.yml build
 
-migrate:
-	python manage.py makemigrations
-	python manage.py migrate
-
-superuser:
-	python manage.py createsuperuser
+docker-run:
+	docker compose -f docker-compose.yml up
