@@ -14,6 +14,7 @@ import routes from '../routes/routes.js';
 
 const IndexPage = () => {
   const [files, setFiles] = useState([]);
+  const [selectedFiles, setselectedFiles] = useState([]);
   const [error, setError] = useState(null);
 
   let count = 0;
@@ -36,7 +37,11 @@ const IndexPage = () => {
     }
   };
 
-  const downloadHandler = async (file) => {
+  const downloadFiles = async (files) => {
+    files.forEach(async (file) => await downloadFile(file))
+  }
+
+  const downloadFile = async (file) => {
     const response = await axios.get(file.link, { responseType: 'blob' })
     const url = URL.createObjectURL(new Blob([response.data]));
     const link = document.createElement("a");
@@ -51,6 +56,17 @@ const IndexPage = () => {
     },
     onSubmit: (values) => handleSubmit(values),
   });
+
+  const selectFileHandler = (file) => {
+    if (selectedFiles.includes(file)) {
+      const fileIndex = selectedFiles.indexOf(file);
+      const newSelectedFiles = [...selectedFiles];
+      newSelectedFiles.splice(fileIndex, 1);
+      setselectedFiles(newSelectedFiles);
+    } else {
+      setselectedFiles([...selectedFiles, file]);
+    }
+  }
 
   return <>
   <IndexNavbar/>
@@ -73,6 +89,14 @@ const IndexPage = () => {
       <Button type="submit">
         Отправить
       </Button>
+      {
+        selectedFiles.length > 0 &&
+        <Button
+          type="submit"
+          onClick={() => downloadFiles(selectedFiles)}>
+          Скачать выбранные файлы
+        </Button>
+      }
       </Container>
       {error}
       {files.length > 0 &&
@@ -80,6 +104,7 @@ const IndexPage = () => {
       <Table striped bordered hover className="text-center">
           <thead>
             <tr>
+              <th></th>
               <th>Номер файла</th>
               <th>Название</th>
               <th></th>
@@ -89,9 +114,15 @@ const IndexPage = () => {
           {files.map((file) => {
           count += 1;
           return <tr key={count}>
+            <td>          
+              <Form.Check
+                type="checkbox"
+                id={count}
+                onChange={() => selectFileHandler(file)}
+              /></td>
             <td>{count}</td>
             <td>{file.filename}</td>
-            <td><button type="button" onClick={() => downloadHandler(file)}>Скачать</button></td>
+            <td><button type="button" onClick={() => downloadFile(file)}>Скачать</button></td>
           </tr>
           // return <Row key={count}>{count}: <a href={file.link}>{file.filename}</a></Row>
         })}
